@@ -1,7 +1,8 @@
 import os
 import shutil
-from fastapi import APIRouter, Request, Form, UploadFile, File
+from fastapi import APIRouter, Request, Form, UploadFile, File, HTTPException
 from fastapi.responses import RedirectResponse, HTMLResponse
+
 from app.deps import hash_password, verify_password, create_jwt, get_current_user
 from app.settings import JWT_COOKIE_NAME, UPLOAD_DIR
 
@@ -29,10 +30,13 @@ def signup(
 
     photo_filename = None
 
-    if photo:
+    if photo and photo.filename:
         os.makedirs(UPLOAD_DIR, exist_ok=True)
-        photo_filename = photo.filename
-        file_path = os.path.join(UPLOAD_DIR, photo_filename)
+
+        safe_name = os.path.basename(photo.filename)  
+        photo_filename = safe_name
+
+        file_path = os.path.join(UPLOAD_DIR, safe_name)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(photo.file, buffer)
 
@@ -67,13 +71,25 @@ def login(
     token = create_jwt({"user_id": user.id})
 
     response = RedirectResponse("/profile", status_code=303)
-    response.set_cookie(JWT_COOKIE_NAME, token)
+
+    response.set_cookie(
+        key=JWT_COOKIE_NAME,
+        value=token,
+        httponly=True,
+        samesite="lax",
+        path="/",
+    )
     return response
+
 
 @router.get("/profile", response_class=HTMLResponse)
 def profile(request: Request):
     templates = request.app.state.templates
-    user = get_current_user(request)
+
+    try:
+        user = get_current_user(request)
+    except HTTPException:
+        return RedirectResponse("/login", status_code=303)
 
     return templates.TemplateResponse("profile.html", {
         "request": request,
