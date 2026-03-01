@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ book.title }}</title>
+</head>
+<body>
+  <h1>{{ book.title }}</h1>
+
+  <p><b>Author:</b> {{ book.author }}</p>
+  <p><b>Year:</b> {{ book.year }}</p>
+  <p><b>Total pages:</b> {{ book.total_pages }}</p>
+  <p><b>Genre:</b> {{ book.genre }}</p>
+
+  <p>
+    <a href="/books/{{ book.id }}/edit">Edit</a> |
+    <a href="/books/">Back to list</a>
+  </p>
+
+  <form method="post" action="/books/{{ book.id }}/delete" style="margin-top: 16px;">
+    <button type="submit">Delete</button>
+  </form>
+</body>
+</html>

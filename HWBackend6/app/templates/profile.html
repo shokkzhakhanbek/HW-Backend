@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Profile</h1>
+
+<p><strong>Email:</strong> {{ user.email }}</p>
+<p><strong>Name:</strong> {{ user.full_name }}</p>
+
+{% if user.photo_filename %}
+  <img src="/app/uploads/{{ user.photo_filename }}" width="150">
+{% endif %}
+
+{% endblock %}

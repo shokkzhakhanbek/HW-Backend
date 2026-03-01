@@ -1,0 +1,4 @@
+SECRET_KEY = "CHANGE_ME_SUPER_SECRET"
+JWT_COOKIE_NAME = "access_token"
+CART_COOKIE_NAME = "cart"
+UPLOAD_DIR = "app/uploads"

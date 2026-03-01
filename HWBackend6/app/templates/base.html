@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>{% block title %}Flowers{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="/static/favicon.ico">
+</head>
+<body>
+  <nav style="display:flex; gap:12px; padding:12px; border-bottom:1px solid #ddd;">
+    <a href="/flowers">Flowers</a>
+    <a href="/cart/items">Cart</a>
+    <a href="/purchased">Purchased</a>
+    <a href="/profile">Profile</a>
+    <a href="/login">Login</a>
+    <a href="/signup">Signup</a>
+  </nav>
+
+  <main style="max-width:900px; margin: 24px auto; padding: 0 16px;">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
