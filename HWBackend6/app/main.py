@@ -14,7 +14,6 @@ from app.repositories.purchases import PurchasesRepository
 
 app = FastAPI()
 
-app.mount("/app/uploads", StaticFiles(directory="app/uploads"), name="uploads")
 app.state.users_repo = UsersRepository()
 app.state.flowers_repo = FlowersRepository()
 app.state.purchases_repo = PurchasesRepository()
@@ -27,6 +26,7 @@ templates = Jinja2Templates(directory="app/templates")
 app.state.templates = templates  
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/app/uploads", StaticFiles(directory="app/uploads"), name="uploads")
 
 app.include_router(auth_router)
 app.include_router(flowers_router)
