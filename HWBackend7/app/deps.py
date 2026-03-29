@@ -3,8 +3,11 @@ import hmac
 import base64
 import json
 import time
-from fastapi import Request, HTTPException
-from app.settings import SECRET_KEY, JWT_COOKIE_NAME
+from fastapi import Request, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
+from app.settings import SECRET_KEY
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 def hash_password(password: str) -> str:
@@ -44,16 +47,12 @@ def decode_jwt(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-def get_current_user(request: Request):
-    token = request.cookies.get(JWT_COOKIE_NAME)
-    if not token:
-        raise HTTPException(status_code=401)
-
+def get_current_user(request: Request, token: str = Depends(oauth2_scheme)):
     payload = decode_jwt(token)
     user_id = payload["user_id"]
 
     user = request.app.state.users_repo.get_by_id(user_id)
     if not user:
-        raise HTTPException(status_code=401)
+        raise HTTPException(status_code=401, detail="User not found")
 
     return user

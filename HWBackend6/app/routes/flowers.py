@@ -1,21 +1,17 @@
 from fastapi import APIRouter, Request, Form
+from fastapi.responses import RedirectResponse, HTMLResponse
 
 router = APIRouter()
 
 
-@router.get("/flowers")
-def get_flowers(request: Request):
+@router.get("/flowers", response_class=HTMLResponse)
+def flowers_page(request: Request):
+    templates = request.app.state.templates
     flowers = request.app.state.flowers_repo.list_all()
-
-    return [
-        {
-            "id": f.id,
-            "title": f.title,
-            "amount": f.amount,
-            "price": f.price
-        }
-        for f in flowers
-    ]
+    return templates.TemplateResponse("flowers.html", {
+        "request": request,
+        "flowers": flowers
+    })
 
 
 @router.post("/flowers")
@@ -25,10 +21,5 @@ def add_flower(
     amount: int = Form(...),
     price: float = Form(...)
 ):
-    flower = request.app.state.flowers_repo.create(
-        title=title,
-        amount=amount,
-        price=price
-    )
-
-    return {"id": flower.id}
+    request.app.state.flowers_repo.create(title=title, amount=amount, price=price)
+    return RedirectResponse("/flowers", status_code=303)

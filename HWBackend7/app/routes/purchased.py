@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Request, HTTPException
-from fastapi.responses import RedirectResponse, HTMLResponse
+from fastapi import APIRouter, Request, Depends
+from fastapi.responses import JSONResponse
 from app.settings import CART_COOKIE_NAME
 from app.deps import get_current_user
 
@@ -15,34 +15,21 @@ def _get_cart_ids(request: Request) -> list[int]:
     except ValueError:
         return []
 
-
 @router.post("/purchased")
-def make_purchase(request: Request):
-    try:
-        user = get_current_user(request)
-    except HTTPException:
-        return RedirectResponse("/login", status_code=303)
-
+def make_purchase(request: Request, user=Depends(get_current_user)):
     cart_ids = _get_cart_ids(request)
     purchases_repo = request.app.state.purchases_repo
 
     for flower_id in cart_ids:
         purchases_repo.add(user_id=user.id, flower_id=flower_id)
 
-    response = RedirectResponse("/purchased", status_code=303)
+    response = JSONResponse(content={"detail": "OK"})
     response.delete_cookie(CART_COOKIE_NAME)
     return response
 
 
-@router.get("/purchased", response_class=HTMLResponse)
-def purchased_page(request: Request):
-    templates = request.app.state.templates
-
-    try:
-        user = get_current_user(request)
-    except HTTPException:
-        return RedirectResponse("/login", status_code=303)
-
+@router.get("/purchased")
+def purchased_list(request: Request, user=Depends(get_current_user)):
     purchases_repo = request.app.state.purchases_repo
     flowers_repo = request.app.state.flowers_repo
 
@@ -54,11 +41,13 @@ def purchased_page(request: Request):
     for p in purchases:
         flower = flowers_repo.get_by_id(p.flower_id)
         if flower:
-            items.append(flower)
+            items.append({
+                "title": flower.title,
+                "price": flower.price
+            })
             total += float(flower.price)
 
-    return templates.TemplateResponse("purchased.html", {
-        "request": request,
+    return {
         "items": items,
         "total": total
-    })
+    }
