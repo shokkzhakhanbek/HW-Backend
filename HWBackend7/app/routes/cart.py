@@ -6,7 +6,6 @@ router = APIRouter()
 
 
 def _get_cart_ids(request: Request) -> list[int]:
-    """Достаём список id цветов из куки."""
     raw = request.cookies.get(CART_COOKIE_NAME)
     if not raw:
         return []
