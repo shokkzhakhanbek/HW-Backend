@@ -1,7 +1,6 @@
 from typing import Optional, List
 from app.models.user import User
 
-
 class UsersRepository:
     def __init__(self):
         self._users: List[User] = []

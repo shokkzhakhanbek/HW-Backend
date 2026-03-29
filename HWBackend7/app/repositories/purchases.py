@@ -1,7 +1,6 @@
 from typing import List
 from app.models.purchase import Purchase
 
-
 class PurchasesRepository:
     def __init__(self):
         self._purchases: List[Purchase] = []

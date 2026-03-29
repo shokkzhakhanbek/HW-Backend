@@ -1,7 +1,6 @@
 from typing import List, Optional
 from app.models.flower import Flower
 
-
 class FlowersRepository:
     def __init__(self):
         self._flowers: List[Flower] = []
